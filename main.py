@@ -16,23 +16,30 @@ class Calcolatrice:#÷
             [ sg.Button("1", expand_x=True , size=(3,1)),sg.Button("2", expand_x=True, size=(3,1)),sg.Button("3", expand_x=True, size=(3,1)),sg.Button("x", expand_x=True, size=(3,1)) ],
             [ sg.Button("4", expand_x=True , size=(3,1)),sg.Button("5", expand_x=True, size=(3,1)),sg.Button("6", expand_x=True, size=(3,1)),sg.Button("-", expand_x=True, size=(3,1)) ],
             [ sg.Button("7", expand_x=True , size=(3,1)),sg.Button("8", expand_x=True, size=(3,1)),sg.Button("9", expand_x=True, size=(3,1)),sg.Button("+", expand_x=True, size=(3,1)) ],
-            [ sg.Button("0", expand_x=True, size=(3,1) ),sg.Button("=", expand_x=True, size=(3,1), key="-eq-") ],
+            [ sg.Button("0", expand_x=True, size=(3,1) ),sg.Button("=", expand_x=True, size=(3,1), key="-eq-", right_click_menu=["kot", "Keep On Top"]) ],
         ]
 
         self.window = sg.Window(title="Calcolatrice", layout=layout, size=self.size)
 
         symbols = ["÷", "x", "-", "+"]
         keep_on_top = False
+
         while True:
             event, values = self.window.read()
 
             if event in ("exit", sg.WIN_CLOSED):
                 break
+            
+            elif event == "Keep On Top":
+                keep_on_top = not(keep_on_top)
+                self.window.TKroot.wm_attributes("-topmost", keep_on_top)
+
             else:
                 if event not in ( "-cls-", "-eq-"):
                     self.window["-output-"].update(values["-output-"]+event)
                 try:
                     op = values["-output-"].replace("x", "*").replace("÷", "/").replace("^", "**").replace(",", ".")
+
                     if event == "-eq-":
                         self.window["-output-"].update(eval(op))
 
@@ -49,6 +56,9 @@ class Calcolatrice:#÷
 
                 except NameError:
                     self.window["-output-"].update("Syntax Error")
+
+                except ZeroDivisionError:
+                    self.window["-output-"].update("Zero Division Error")
 
                 except Exception as e:
                     sg.popup_error(e)
